@@ -21,11 +21,9 @@ public class OrderItem {
 
     private int quantity;
 
-    private double price; // single unit price at time of order
+    private double price;       // unit price
+    private double totalPrice;  // quantity * price
 
-    private double totalPrice; // quantity * price
-
-    // Constructors
     public OrderItem() {}
 
     public OrderItem(Order order, Product product, int quantity, double price) {
@@ -33,11 +31,10 @@ public class OrderItem {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
-        this.totalPrice = price * quantity;
+        this.totalPrice = quantity * price;
     }
 
-    // Getters and setters
-
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -64,7 +61,7 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-        this.totalPrice = this.price * quantity; // Update total price
+        this.totalPrice = this.price * quantity;
     }
 
     public double getPrice() {
@@ -73,7 +70,7 @@ public class OrderItem {
 
     public void setPrice(double price) {
         this.price = price;
-        this.totalPrice = this.price * this.quantity;
+        this.totalPrice = this.quantity * price;
     }
 
     public double getTotalPrice() {

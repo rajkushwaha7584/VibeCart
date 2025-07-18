@@ -10,6 +10,6 @@ import ecommerce_website.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findByCategory(String category);
-
+    boolean existsByName(String name);
 	List<Product> findBySellerEmail(String sellerEmail);
 }

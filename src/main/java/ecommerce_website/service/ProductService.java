@@ -12,18 +12,19 @@ public class ProductService {
 	private ProductRepository productRepository;
 	@PostConstruct
 	public void initData() {
-	    for (int i = 1; i <= 200; i++) { // Insert 200 products
-	        Product p = new Product();
-	        p.setName("Product " + i);
-	        p.setDescription("Demo product " + i);
-	        p.setPrice(1000.0 + i);
-	        p.setStock(10);
-	        p.setCategory("Demo");
-	        p.setImageUrl("/images/product" + i + ".jpeg");
-	        productRepository.save(p);
+	    if (!productRepository.existsByName("Product 1")) {
+	        for (int i = 1; i <= 3; i++) {
+	            Product p = new Product();
+	            p.setName("Product " + i);
+	            p.setDescription("Demo product " + i);
+	            p.setPrice(1000.0 + i);
+	            p.setStock(10);
+	            p.setCategory("Demo");
+	            p.setImageUrl("/images/product" + i + ".jpeg");
+	            productRepository.save(p);
+	        }
 	    }
 	}
-
 
 
 }

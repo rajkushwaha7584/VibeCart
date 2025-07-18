@@ -30,21 +30,14 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/",
-                		"/register",
-                		"/register/**",
-                		"/login",
-                		"/verify-otp",
-                		"/thankyou", "/css/**"
-                		, "/js/**"
-                		, "/images/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/seller/**").hasRole("SELLER")
-                .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                .requestMatchers("/cart/**", "/checkout/**").hasRole("USER")
-                .anyRequest().authenticated()
-            )
+            	    .requestMatchers("/", "/register", "/register/**", "/login", "/verify-otp", "/thankyou", "/css/**", "/js/**", "/images/**").permitAll()
+            	    .requestMatchers("/cart/**", "/checkout/**").hasAnyRole("USER", "CUSTOMER")
+            	    .requestMatchers("/cart/**", "/checkout/**","/payment/**").hasAnyRole("USER", "CUSTOMER") // or adjust as needed
+            	    .requestMatchers("/admin/**").hasRole("ADMIN")
+            	    .requestMatchers("/seller/**").hasRole("SELLER")
+            	    .anyRequest().authenticated()
+            	)
+
             .formLogin(login -> login
                 .loginPage("/register")                   // 👈 Same page for login
                 .loginProcessingUrl("/login")             // 👈 Spring handles POST /login
@@ -61,7 +54,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

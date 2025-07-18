@@ -27,21 +27,22 @@ public class CartController {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+
     @Autowired
     private CartService cartService;
-    
-    @PostMapping("/cart/add/{productId}")
+
+    // ✅ Add product to cart
+    @GetMapping("/cart/go-add/{productId}")
     public String addToCart(@PathVariable Long productId, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
         String email = principal.getName();
         User user = userRepository.findByEmail(email);
 
         Product product = productRepository.findById(productId).orElse(null);
-        if (product == null) {
-            return "redirect:/error";
-        }
+        if (product == null) return "redirect:/error";
 
         CartItem existingItem = cartItemRepository.findByUserAndProduct(user, product);
-
         if (existingItem != null) {
             existingItem.setQuantity(existingItem.getQuantity() + 1);
             cartItemRepository.save(existingItem);
@@ -51,7 +52,7 @@ public class CartController {
             cartItem.setProduct(product);
             cartItem.setProductName(product.getName());
             cartItem.setProductPrice(product.getPrice());
-            cartItem.setImageUrl(product.getImageUrl()); // ✅ You were missing this
+            cartItem.setImageUrl(product.getImageUrl());
             cartItem.setQuantity(1);
             cartItemRepository.save(cartItem);
         }
@@ -59,71 +60,119 @@ public class CartController {
         return "redirect:/cart";
     }
 
-
-//    @GetMapping("/cart")
-//    public String showCart(Model model, Principal principal) {
-//        User user = userRepository.findByEmail(principal.getName());
-//        List<CartItem> cartItems = cartItemRepository.findByUser(user);
-//
-//        double total = cartItems.stream()
-//                .mapToDouble(CartItem::getTotalPrice)
-//                .sum();
-//
-//        model.addAttribute("cartItems", cartItems);
-//        model.addAttribute("total", total);
-//
-//        return "cart";
-//    }   
+    // ✅ Show cart page
     @GetMapping("/cart")
-    public String viewCart(Model model, Principal principal) {
+    public String showCart(Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
         String email = principal.getName();
         User user = userRepository.findByEmail(email);
 
         List<CartItem> cartItems = cartItemRepository.findByUser(user);
-        model.addAttribute("cartItems", cartItems);
+        double total = cartItems.stream().mapToDouble(CartItem::getTotalPrice).sum();
 
-        return "cart"; // should map to `cart.html`
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("total", total);
+
+        return "cart";
     }
 
+    // ✅ Update quantity of cart item
     @PostMapping("/cart/update/{id}")
-    public String updateQuantity(@PathVariable Long id, @RequestParam("quantity") int quantity, Principal principal) {
+    public String updateQuantity(@PathVariable Long id,
+                                 @RequestParam("quantity") int quantity,
+                                 Principal principal) {
+        if (principal == null) return "redirect:/login";
+
         User user = userRepository.findByEmail(principal.getName());
         CartItem item = cartItemRepository.findByUserAndProduct_Id(user, id);
+
         if (item != null && quantity > 0) {
             item.setQuantity(quantity);
             cartItemRepository.save(item);
         }
+
         return "redirect:/cart";
     }
 
+    // ✅ Remove item from cart
     @PostMapping("/cart/remove/{id}")
     public String removeItem(@PathVariable Long id, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
         User user = userRepository.findByEmail(principal.getName());
         CartItem item = cartItemRepository.findByUserAndProduct_Id(user, id);
+
         if (item != null) {
             cartItemRepository.delete(item);
         }
+
         return "redirect:/cart";
     }
 
-    @PostMapping("/checkout")
-    public String checkout(@RequestParam(value = "selectedProductIds", required = false) List<Long> selectedIds,
-                           Principal principal, Model model) {
-        if (selectedIds == null || selectedIds.isEmpty()) {
-            model.addAttribute("error", "Please select at least one product to checkout.");
-            return "redirect:/cart";
+    // ✅ Checkout page with all cart items (GET)
+    @GetMapping("/checkout")
+    public String checkoutPage(Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return "redirect:/login?error=user-not-found";
         }
+        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+        double total = cartItems.stream()
+                .mapToDouble(item -> item.getProductPrice() * item.getQuantity())
+                .sum();
 
-        User user = userRepository.findByEmail(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("total", total);
 
-        List<CartItem> selectedItems = cartItemRepository.findByUserAndProduct_IdIn(user, selectedIds);
-        double totalAmount = selectedItems.stream().mapToDouble(CartItem::getTotalPrice).sum();
-
-        // Proceed with order logic or redirection to payment
-        model.addAttribute("checkoutItems", selectedItems);
-        model.addAttribute("totalAmount", totalAmount);
-        return "checkout"; // Create a checkout.html
+        return "checkout";
     }
 
+    @PostMapping("/checkout")
+    public String processCheckout(@RequestParam(value = "selectedProductIds", required = false) List<Long> selectedIds,
+                                  Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        if (selectedIds == null || selectedIds.isEmpty()) {
+            return "redirect:/cart?error=nothing-selected";
+        }
+
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return "redirect:/login?error=user-not-found";
+        }
+
+        List<CartItem> selectedItems = cartItemRepository.findByUser(user).stream()
+                .filter(item -> selectedIds.contains(item.getProduct().getId()))
+                .toList();
+
+        double total = selectedItems.stream()
+                .mapToDouble(item -> item.getProductPrice() * item.getQuantity())
+                .sum();
+
+        List<Product> products = selectedItems.stream()
+                .map(CartItem::getProduct)
+                .toList();
+
+        List<Integer> quantities = selectedItems.stream()
+                .map(CartItem::getQuantity)
+                .toList();
+
+        model.addAttribute("user", user);
+        model.addAttribute("products", products);
+        model.addAttribute("quantities", quantities);
+        model.addAttribute("total", total);
+
+        return "checkout";
+    }
 
 }

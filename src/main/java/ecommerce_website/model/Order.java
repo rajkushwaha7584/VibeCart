@@ -30,20 +30,11 @@ public class Order {
 
     private String deliveryAddress;
 
-    private String paymentMethod; // e.g. "COD", "UPI", "Card"
-    
-    private String orderStatus; // e.g. "PLACED", "SHIPPED", "DELIVERED"
+    private String paymentMethod; // e.g., "COD", "UPI", "Card"
+
+    private String orderStatus; // e.g., "PLACED", "SHIPPED", "DELIVERED"
 
     private LocalDateTime orderDate;
 
     private double totalAmount;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;
-
-    // Constructors
-
-
-    // Getters and setters
-
 }
