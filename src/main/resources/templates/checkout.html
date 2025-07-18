@@ -1,0 +1,16 @@
+<h2>Shipping Details</h2>
+<form th:action="@{/payment}" method="post">
+  <input type="hidden" name="email" th:value="${user.email}">
+  <input type="text" name="address" class="form-control" placeholder="Enter delivery address" required>
+  <hr>
+  <h4>Products:</h4>
+  <div th:each="product, iStat : ${products}">
+    <p>
+      <span th:text="${product.name}"></span> -
+      Qty: <span th:text="${quantities[iStat.index]}"></span>
+      <input type="hidden" name="productIds" th:value="${product.id}">
+      <input type="hidden" name="quantities" th:value="${quantities[iStat.index]}">
+    </p>
+  </div>
+  <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+</form>

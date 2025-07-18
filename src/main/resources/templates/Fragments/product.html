@@ -1,0 +1,15 @@
+<!-- templates/fragments/product.html -->
+<div th:fragment="productCard(product)">
+  <div class="card h-100 shadow-sm border-0">
+    <img th:src="@{${product.imageUrl}}" class="card-img-top" alt="Product Image"
+         style="height: 200px; object-fit: cover;">
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title" th:text="${product.name}">Product Name</h5>
+	  <p>Product ID: <span th:text="${product.id}"></span></p>
+      <p class="card-text" th:text="${product.description}">Description</p>
+      <p class="card-text fw-bold text-success">₹ <span th:text="${product.price}">0.00</span></p>
+	  <h5>ID: <span th:text="${product.id}"></span></h5>
+  <a th:href="@{/cart/add/{id}(id=${product.id})}" class="btn btn-primary">Add to Cart</a>
+    </div>
+  </div>
+</div>

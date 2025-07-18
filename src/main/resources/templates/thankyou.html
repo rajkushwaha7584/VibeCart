@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thank You - VibeCart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .thankyou-box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .thankyou-box h1 {
+            font-size: 36px;
+            color: #00b09b;
+            margin-bottom: 20px;
+        }
+
+        .thankyou-box p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: #00b09b;
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #008f7a;
+        }
+    </style>
+</head>
+<body>
+<div class="thankyou-box">
+	<h1>🎉 Thank You for Registering!</h1>
+	<p>Redirecting to homepage...</p>
+
+
+    <a href="/login.html" class="btn btn-lg">Go to Login</a>
+	<script>
+	  setTimeout(() => window.location.href = "/home", 3000);
+	</script>
+	</div>
+</body>
+</html>
