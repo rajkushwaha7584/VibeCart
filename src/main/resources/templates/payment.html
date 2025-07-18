@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment | VibeCart</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .payment-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .payment-options {
+            width: 60%;
+            border-right: 1px solid #ccc;
+            padding-right: 20px;
+        }
+
+        .payment-summary {
+            width: 35%;
+            padding-left: 20px;
+        }
+
+        .pay-method {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .pay-method:hover {
+            background-color: #e9f7fe;
+        }
+
+        .active-method {
+            border: 2px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container payment-container">
+    <!-- Left Side: Payment Methods -->
+    <div class="payment-options">
+        <h4>Select Payment Method</h4>
+
+        <div class="pay-method active-method" id="upi-method">
+            <strong>UPI</strong>
+            <p>Pay via any UPI app</p>
+            <input type="text" class="form-control" placeholder="Enter your UPI ID" id="upiId" />
+        </div>
+
+        <div class="pay-method" id="card-method">
+            <strong>Card Payment</strong>
+            <p>Pay via Debit/Credit/ATM cards</p>
+        </div>
+
+        <div class="pay-method" id="netbanking-method">
+            <strong>Net Banking</strong>
+            <p>Use your internet banking account</p>
+        </div>
+
+        <div class="pay-method" id="cod-method">
+            <strong>Cash on Delivery</strong>
+            <p>Pay when your order is delivered</p>
+        </div>
+    </div>
+
+    <!-- Right Side: Summary and Pay Button -->
+    <div class="payment-summary">
+        <h4>Order Summary</h4>
+        <p><strong>Price (Items):</strong> ₹<span th:text="${totalAmount}">0</span></p>
+        <p><strong>Shipping:</strong> Free</p>
+        <hr>
+        <h5>Total: ₹<span th:text="${totalAmount}">0</span></h5>
+        <p><strong>Address:</strong> <span th:text="${address}">Your address</span></p>
+        <button class="btn btn-primary btn-block mt-4" id="rzp-button">Pay ₹<span th:text="${totalAmount}">0</span></button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var totalAmount = /*[[${totalAmount}]]*/ 0;
+    var email = /*[[${email}]]*/ '';
+    var options = {
+        "key": "rzp_test_YourKeyHere", // ✅ Replace with your Razorpay Key
+        "amount": Math.round(totalAmount * 100), // Amount in paisa
+        "currency": "INR",
+        "name": "VibeCart",
+        "description": "Purchase Order",
+        "handler": function (response) {
+            window.location.href = "/payment/success?paymentId=" + response.razorpay_payment_id;
+        },
+        "prefill": {
+            "email": email
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function (e) {
+        rzp.open();
+        e.preventDefault();
+    };
+    /*]]>*/
+</script>
+
+</body>
+</html>

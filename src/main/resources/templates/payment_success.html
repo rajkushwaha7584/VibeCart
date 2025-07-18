@@ -1,3 +1,12 @@
-<h2>🎉 Payment Successful!</h2>
-<p>Order placed successfully. Thank you for shopping!</p>
-<a href="/my-orders" class="btn btn-outline-primary">View My Orders</a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment Successful</title>
+</head>
+<body>
+    <h2>Thank you for your order!</h2>
+    <p>Order ID: <span th:text="${order.id}"></span></p>
+    <p>Total Amount: ₹<span th:text="${grandTotal}"></span></p>
+    <p>Status: <span th:text="${order.status}"></span></p>
+</body>
+</html>

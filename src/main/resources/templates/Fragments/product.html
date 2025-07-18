@@ -9,7 +9,8 @@
       <p class="card-text" th:text="${product.description}">Description</p>
       <p class="card-text fw-bold text-success">₹ <span th:text="${product.price}">0.00</span></p>
 	  <h5>ID: <span th:text="${product.id}"></span></h5>
-  <a th:href="@{/cart/add/{id}(id=${product.id})}" class="btn btn-primary">Add to Cart</a>
+	  <a th:href="@{/cart/go-add/{id}(id=${product.id})}" class="btn btn-primary">Add to Cart</a>
+
     </div>
   </div>
 </div>
